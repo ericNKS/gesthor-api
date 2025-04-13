@@ -46,6 +46,16 @@ class Company
         $this->officials = new ArrayCollection();
     }
 
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'cnpj' => $this->getCnpj(),
+        ];
+    }
+
     public function getId(): ?int
     {
         return $this->id;

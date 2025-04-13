@@ -3,8 +3,13 @@
 namespace App\Controller;
 
 use App\Repository\CompanyRepository;
+use App\Services\Company\Create;
 use App\Services\Company\Find;
+use Doctrine\DBAL\Types\StringType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,7 +29,21 @@ final class CompanyController extends AbstractController
             ]);
         }
 
+        return $this->json($company->jsonSerialize());
+    }
+
+    #[Route('', name: 'create_company', methods: ['POST'])]
+    public function store(
+        Request $request,
+        EntityManagerInterface $em,
+        FormFactoryInterface $formFactory
+    ): Response
+    {
+        $body = json_decode($request->getContent(), true);
+
+        $companyService = new Create($em, $formFactory);
+        $company = $companyService->execute($body);
+
         return $this->json($company);
     }
-    
 }

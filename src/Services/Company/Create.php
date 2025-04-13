@@ -3,20 +3,26 @@
 namespace App\Services\Company;
 
 use App\Entity\Company;
+use App\Form\CompanyType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class Create
 {
     public function __construct(
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
+        private FormFactoryInterface $formFactory
     ){}
 
     public function execute(array $companyData): Company {
-        $this->isValid($companyData);
-
         $company = new Company();
-        $company->setName($companyData['name']);
-        $company->setCnpj($companyData['cnpj']);
+
+        $form = $this->formFactory->create(CompanyType::class, $company);
+        $form->submit($companyData);
+
+        $this->isValid($form);
 
         $this->em->persist($company);
         $this->em->flush();
@@ -24,21 +30,16 @@ class Create
         return $company;
     }
 
-    private function  isValid (array $company) {
-        if (!isset($company['cnpj']) ) {
-            throw new \Exception('CNPJ is required');
+    private function  isValid (FormInterface $form) {
+        if ($form->isValid()) {
+            return;
         }
 
-        if (strlen($company['cnpj']) != 14) {
-            throw new \Exception('CNPJ length is invalid');
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
         }
 
-        if(!isset($company['name'])) {
-            throw new \Exception('Name is required');
-        }
-
-        if(strlen($company['name']) < 3) {
-            throw new \Exception('Name length is invalid');
-        }
+        throw new BadRequestHttpException(json_encode($errors));
     }
 }
