@@ -4,7 +4,7 @@ namespace App\Tests\Services\Company;
 
 use App\Entity\Company;
 use App\Repository\CompanyRepository;
-use App\Services\Company\Find;
+use App\Services\Company\CompanyFind;
 use PHPUnit\Framework\TestCase;
 
 class FindCompanyTest extends TestCase
@@ -20,8 +20,8 @@ class FindCompanyTest extends TestCase
         $mockRepository->method('find')
             ->willReturn($mockCompany);
         
-        // Create the service with our mock repository
-        $findService = new Find($mockRepository);
+        // CompanyCreate the service with our mock repository
+        $findService = new CompanyFind($mockRepository);
 
         // Execute the service
         $result = $findService->execute(1);
@@ -32,7 +32,7 @@ class FindCompanyTest extends TestCase
     
     public function testExecuteNotFound(): void
     {
-        // Create a mock repository
+        // CompanyCreate a mock repository
         $mockRepository = $this->createMock(CompanyRepository::class);
         
         // Configure the mock to return null when find(999) is called
@@ -41,8 +41,8 @@ class FindCompanyTest extends TestCase
                 [999, null]  // When find(999) is called, return null
             ]);
         
-        // Create the service with our mock repository
-        $findService = new Find(999, $mockRepository);
+        // CompanyCreate the service with our mock repository
+        $findService = new CompanyFind(999, $mockRepository);
         
         // Execute the service
         $result = $findService->execute();

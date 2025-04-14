@@ -4,7 +4,7 @@ namespace App\Tests\Services\Company;
 
 use App\Entity\Company;
 use App\Form\CompanyType;
-use App\Services\Company\Create;
+use App\Services\Company\CompanyCreate;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -20,8 +20,8 @@ class CreateCompanyTest extends TestCase
             'cnpj' => '12345678910121',
         ];
 
-        // Create an actual service to test
-        $createService = new Create(
+        // CompanyCreate an actual service to test
+        $createService = new CompanyCreate(
             $this->getEntityManagerMock($companyData),
             $this->getFormFactoryMock($companyData)
         );
@@ -65,7 +65,7 @@ class CreateCompanyTest extends TestCase
                 return $capturedCompany;
             });
 
-        // Create the form factory mock
+        // CompanyCreate the form factory mock
         $formFactory = $this->createMock(FormFactoryInterface::class);
         $formFactory->expects($this->once())
             ->method('create')

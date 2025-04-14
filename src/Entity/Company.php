@@ -39,6 +39,9 @@ class Company
     #[ORM\OneToMany(targetEntity: Official::class, mappedBy: 'comId')]
     private Collection $officials;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -171,6 +174,18 @@ class Company
                 $official->setComId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }

@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class Create
+class CompanyCreate
 {
     public function __construct(
         private EntityManagerInterface $em,

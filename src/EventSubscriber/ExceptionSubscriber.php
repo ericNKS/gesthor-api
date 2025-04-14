@@ -21,7 +21,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $statusCode = $exception->getStatusCode();
         }
         
-        // Create response data
+        // CompanyCreate response data
         $responseData = [
             'status' => $statusCode,
             'error' => true,
@@ -34,7 +34,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $responseData['details'] = $exception->getMessage() ?: 'The requested resource was not found on this server';
         }
         
-        // Create and configure JSON response
+        // CompanyCreate and configure JSON response
         $response = new JsonResponse($responseData, $statusCode);
         
         // Set the response on the event

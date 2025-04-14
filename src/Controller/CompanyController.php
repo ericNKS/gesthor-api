@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Repository\CompanyRepository;
-use App\Services\Company\Create;
-use App\Services\Company\Find;
+use App\Services\Company\CompanyCreate;
+use App\Services\Company\CompanyFind;
+use App\Services\Company\CompanyUpdate;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,17 +17,17 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/company')]
 final class CompanyController extends AbstractController
 {
-    #[Route('/{id}', name:'find_company', methods: ['GET'])]
+    #[Route('/{id}', name:'find_company', methods: ['GET'], requirements:['id' => '\d+'])]
     public function find(int $id, CompanyRepository $repository): Response
     {
-        $findService = new Find($repository);
+        $findService = new CompanyFind($repository);
 
         $company = $findService->execute($id);
 
         if (!$company) {
             return $this->json([
                 'error' => 'Company not found'
-            ]);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         return $this->json($company->jsonSerialize());
@@ -41,9 +42,37 @@ final class CompanyController extends AbstractController
     {
         $body = json_decode($request->getContent(), true);
 
-        $companyService = new Create($em, $formFactory);
+        $companyService = new CompanyCreate($em, $formFactory);
         $company = $companyService->execute($body);
 
         return $this->json($company);
+    }
+
+    #[Route('/{id}', name:'update_company', methods: ['PATCH', 'PUT'], requirements:['id' => '\d+'])]
+    public function update(
+        int $id,
+        CompanyRepository $repository,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
+    {
+        $findService = new CompanyFind($repository);
+
+        $company = $findService->execute($id);
+
+        if(!$company) {
+            return $this->json([
+                'error' => 'Company not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+
+        $body = json_decode($request->getContent(), true);
+
+        $companyUpdate = new CompanyUpdate($em);
+
+        $company = $companyUpdate->execute($company, $body);
+
+        return $this->json($company->jsonSerialize());
     }
 }

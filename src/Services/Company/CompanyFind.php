@@ -5,7 +5,7 @@ namespace App\Services\Company;
 use App\Entity\Company;
 use App\Repository\CompanyRepository;
 
-class Find
+class CompanyFind
 {
     public function __construct(
         private CompanyRepository $repository
