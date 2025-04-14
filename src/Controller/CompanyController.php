@@ -75,4 +75,31 @@ final class CompanyController extends AbstractController
 
         return $this->json($company->jsonSerialize());
     }
+
+    #[Route('/{id}', name:'softDelete_company', methods: ['DELETE'], requirements:['id' => '\d+'])]
+    public function update(
+        int $id,
+        CompanyRepository $repository,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
+    {
+        $findService = new CompanyFind($repository);
+
+        $company = $findService->execute($id);
+
+        if(!$company) {
+            return $this->json([
+                'error' => 'Company not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $body = json_decode($request->getContent(), true);
+
+        $companyUpdate = new CompanyUpdate($em);
+
+        $company = $companyUpdate->execute($company, $body);
+
+        return $this->json($company->jsonSerialize());
+    }
 }
