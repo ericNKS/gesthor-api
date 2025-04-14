@@ -18,4 +18,8 @@ class CompanyDelete
 
         $this->em->flush();
     }
+
+    public function delete(Company $company): void {
+        $this->em->remove($company);
+    }
 }

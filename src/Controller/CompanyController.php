@@ -77,7 +77,7 @@ final class CompanyController extends AbstractController
     }
 
     #[Route('/{id}', name:'softDelete_company', methods: ['DELETE'], requirements:['id' => '\d+'])]
-    public function update(
+    public function delete(
         int $id,
         CompanyRepository $repository,
         Request $request,

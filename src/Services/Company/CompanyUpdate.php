@@ -17,7 +17,7 @@ class CompanyUpdate
         array $newDataCompany
     ): Company {
 
-        if (isset($newDataCompany['name'])){
+        if (isset($newDataCompany['name']) && !empty($newDataCompany['name'])) {
             $company->setName($newDataCompany['name']);
         }
 
