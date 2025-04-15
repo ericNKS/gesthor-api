@@ -14,6 +14,10 @@ class CompanyDelete
 
     public function softDelete(Company $company): void
     {
+        if(!is_null($company->getDeletedAt())){
+            return;
+        }
+
         $company->setDeletedAt(new \DateTimeImmutable());
 
         $this->em->flush();
