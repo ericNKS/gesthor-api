@@ -22,12 +22,6 @@ class Company
     private ?string $cnpj = null;
 
     /**
-     * @var Collection<int, User>
-     */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'comId')]
-    private Collection $users;
-
-    /**
      * @var Collection<int, Rule>
      */
     #[ORM\OneToMany(targetEntity: Rule::class, mappedBy: 'ComId')]
@@ -42,11 +36,17 @@ class Company
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'comId')]
+    private Collection $users;
+
     public function __construct()
     {
-        $this->users = new ArrayCollection();
         $this->rules = new ArrayCollection();
         $this->officials = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
 
@@ -85,36 +85,6 @@ class Company
     public function setCnpj(string $cnpj): static
     {
         $this->cnpj = $cnpj;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): static
-    {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->setComId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): static
-    {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getComId() === $this) {
-                $user->setComId(null);
-            }
-        }
 
         return $this;
     }
@@ -187,6 +157,36 @@ class Company
     public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setComId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getComId() === $this) {
+                $user->setComId(null);
+            }
+        }
 
         return $this;
     }
