@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\CompanyRepository;
 use App\Services\Company\CompanyCreate;
+use App\Services\Company\CompanyDelete;
 use App\Services\Company\CompanyFind;
 use App\Services\Company\CompanyUpdate;
 use Doctrine\DBAL\Types\StringType;
@@ -96,10 +97,10 @@ final class CompanyController extends AbstractController
 
         $body = json_decode($request->getContent(), true);
 
-        $companyUpdate = new CompanyUpdate($em);
+        $companyUpdate = new CompanyDelete($em);
 
-        $company = $companyUpdate->execute($company, $body);
+        $company = $companyUpdate->softDelete($company);
 
-        return $this->json($company->jsonSerialize());
+    return $this->json([], Response::HTTP_NO_CONTENT);
     }
 }
