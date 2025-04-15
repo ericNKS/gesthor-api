@@ -56,6 +56,7 @@ class Company
             'id' => $this->getId(),
             'name' => $this->getName(),
             'cnpj' => $this->getCnpj(),
+            'deleted_at' => $this->getDeletedAt(),
         ];
     }
 
