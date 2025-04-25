@@ -7,7 +7,6 @@ use App\Services\Company\CompanyCreate;
 use App\Services\Company\CompanyDelete;
 use App\Services\Company\CompanyFind;
 use App\Services\Company\CompanyUpdate;
-use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -19,9 +18,12 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CompanyController extends AbstractController
 {
     #[Route('/{id}', name:'find_company', methods: ['GET'], requirements:['id' => '\d+'])]
-    public function find(int $id, CompanyRepository $repository): Response
+    public function find(
+        int $id,
+        CompanyRepository $repository,
+        CompanyFind $findService,
+    ): Response
     {
-        $findService = new CompanyFind($repository);
 
         $company = $findService->execute($id);
 
@@ -31,14 +33,14 @@ final class CompanyController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($company->jsonSerialize());
+        return $this->json($company);
     }
 
     #[Route('', name: 'create_company', methods: ['POST'])]
     public function store(
         Request $request,
         EntityManagerInterface $em,
-        FormFactoryInterface $formFactory
+        FormFactoryInterface $formFactory,
     ): Response
     {
         $body = json_decode($request->getContent(), true);
@@ -46,7 +48,7 @@ final class CompanyController extends AbstractController
         $companyService = new CompanyCreate($em, $formFactory);
         $company = $companyService->execute($body);
 
-        return $this->json($company);
+        return $this->json($company, Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name:'update_company', methods: ['PATCH', 'PUT'], requirements:['id' => '\d+'])]
@@ -74,7 +76,7 @@ final class CompanyController extends AbstractController
 
         $company = $companyUpdate->execute($company, $body);
 
-        return $this->json($company->jsonSerialize());
+        return $this->json($company);
     }
 
     #[Route('/{id}', name:'softDelete_company', methods: ['DELETE'], requirements:['id' => '\d+'])]

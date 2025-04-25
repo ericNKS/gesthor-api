@@ -14,6 +14,10 @@ class CompanyFind
     public function execute(int $id): ?Company {
         $company = $this->repository->find($id);
 
+        if(!$company) {
+            return null;
+        }
+
         if (!is_null($company->getDeletedAt())) {
             return null;
         }

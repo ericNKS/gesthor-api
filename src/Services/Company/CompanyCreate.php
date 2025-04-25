@@ -4,6 +4,7 @@ namespace App\Services\Company;
 
 use App\Entity\Company;
 use App\Form\CompanyType;
+use App\Repository\CompanyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
