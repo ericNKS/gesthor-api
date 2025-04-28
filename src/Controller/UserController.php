@@ -48,7 +48,8 @@ final class UserController extends AbstractController
         EntityManagerInterface $em,
         FormFactoryInterface $formFactory,
         UserRepository $repository,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        JWTTokenManagerInterface $jwtManager
     ): Response
     {
         $body = json_decode($request->getContent(), true);
@@ -63,10 +64,7 @@ final class UserController extends AbstractController
             'password' => $user->getPassword(),
         ]);
 
-        $userFind = new UserFind($repository);
-        $auth = new UserAuth($userFind);
-
-        $token = $auth->execute($userAuth);
+        $token = $jwtManager->create($userAuth);
 
         return $this->json([
             'user' => $user,
