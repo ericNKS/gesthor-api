@@ -41,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
             'id' => $this->getId(),
             'email' => $this->getEmail(),
             'comId' => $this->getComId(),
-            'roles' => $this->getRoles()
+            'roles' => $this->getRoles(),
         ];
     }
 
