@@ -9,3 +9,7 @@ lexik_jwt_authentication:
             enabled: true
             prefix: Bearer
             name: Authorization
+
+    blocklist_token:
+        enabled: true
+        cache: cache.app
