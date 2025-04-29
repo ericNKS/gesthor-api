@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\DTO\AuthRequest;
+use App\Repository\CompanyRepository;
 use App\Repository\UserRepository;
+use App\Services\Company\CompanyFind;
 use App\Services\User\UserAuth;
 use App\Services\User\UserCreate;
 use App\Services\User\UserFind;
@@ -27,8 +29,11 @@ final class UserController extends AbstractController
     public function find(
         int $id,
         UserRepository $repository,
+        TokenStorageInterface $tokenStorage
     ): Response
     {
+        $atualUserCompanyId = $tokenStorage->getToken()->getUser()->getComId();
+
         $userFindService = new UserFind($repository);
         $user = $userFindService->byId($id);
 
@@ -36,6 +41,14 @@ final class UserController extends AbstractController
             return $this->json([
                 'error' => 'User not found',
             ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($atualUserCompanyId !== $user->getComId()) {
+            return $this->json([
+                'message' => 'Access denied',
+            ],
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
         return $this->json($user, Response::HTTP_OK);
@@ -47,27 +60,31 @@ final class UserController extends AbstractController
         EntityManagerInterface $em,
         FormFactoryInterface $formFactory,
         UserRepository $repository,
+        CompanyRepository $companyRepository,
         UserPasswordHasherInterface $passwordHasher,
         JWTTokenManagerInterface $jwtManager
     ): Response
     {
         $body = json_decode($request->getContent(), true);
 
-        $findService = new UserFind($repository);
+        $findUserService = new UserFind($repository);
+        $findCompanyService = new CompanyFind($companyRepository);
 
-        $userCreateService = new UserCreate($em, $formFactory, $findService, $passwordHasher);
+        $userCreateService = new UserCreate($em, $findCompanyService, $formFactory, $findUserService, $passwordHasher);
         $user = $userCreateService->execute($body);
 
-        $userAuth = new AuthRequest([
-            'email' => $user->getEmail(),
-            'password' => $user->getPassword(),
-        ]);
+        if (!$user) {
+            return $this->json([
+                'error' => 'something went wrong',
+            ],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
 
-        $token = $jwtManager->create($userAuth);
+        $token = $jwtManager->create($user);
 
         return $this->json([
-            'user' => $user,
-            'token' => $token,
+            'token' => $token
         ], Response::HTTP_CREATED);
     }
 

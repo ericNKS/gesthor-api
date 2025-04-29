@@ -5,6 +5,7 @@ namespace App\Services\User;
 use App\Entity\User;
 use App\Form\UserRegisterType;
 use App\Repository\UserRepository;
+use App\Services\Company\CompanyFind;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -15,6 +16,7 @@ class UserCreate
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private CompanyFind $companyFind,
         private FormFactoryInterface $formFactory,
         private UserFind $userFind,
         private UserPasswordHasherInterface $passwordHasher,
@@ -22,6 +24,16 @@ class UserCreate
 
     public function execute(array $userData): ?User
     {
+        if (!isset($userData['comId'])) {
+            throw new BadRequestHttpException('Missing comId parameter');
+        }
+        $company = $this->companyFind->execute(intval($userData['comId']));
+
+        if (!$company) {
+            throw new BadRequestHttpException('cannot create user in a deleted company');
+        }
+
+
         $user = new User();
 
         $form = $this->formFactory->create(UserRegisterType::class, $user);
@@ -33,6 +45,8 @@ class UserCreate
 
         $this->em->persist($user);
         $this->em->flush();
+
+        return $user;
     }
 
     private function isValid(FormInterface $form): void {
