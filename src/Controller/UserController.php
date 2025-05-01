@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 #[Route('/api')]
 final class UserController extends AbstractController
 {
-    #[Route('/user/{id}', name: 'find_user', methods: ['GET'])]
+    #[Route('/users/{id}', name: 'find_user', methods: ['GET'])]
     public function find(
         int $id,
         UserRepository $repository,
@@ -50,6 +50,17 @@ final class UserController extends AbstractController
                 Response::HTTP_BAD_REQUEST
             );
         }
+
+        return $this->json($user, Response::HTTP_OK);
+    }
+
+    #[Route('/users', name: 'get_user', methods: ['GET'])]
+    public function show(
+        TokenStorageInterface $tokenStorage
+    ): Response
+    {
+        $token = $tokenStorage->getToken();
+        $user = $token->getUser();
 
         return $this->json($user, Response::HTTP_OK);
     }
