@@ -42,10 +42,10 @@ class FindCompanyTest extends TestCase
             ]);
         
         // CompanyCreate the service with our mock repository
-        $findService = new CompanyFind(999, $mockRepository);
+        $findService = new CompanyFind($mockRepository);
         
         // Execute the service
-        $result = $findService->execute();
+        $result = $findService->execute(999);
         
         // Assert the result is null
         $this->assertNull($result);
